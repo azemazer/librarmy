@@ -1,49 +1,49 @@
 <script>
-    import Multiselect from 'vue-multiselect'
     import axios from 'axios';
-    import { Head } from '@inertiajs/vue3';
 
     export default {
         props: {
-            book: {
-                type: Object,
-                default: {}
-            },
-            all_tags: {
+            all_editions: {
                 type: Array,
-                default: []
+                default: {
+                }
             }
         },
-        components: { Multiselect },
         data () {
             return {
-                new_tags: "",
-                current_tags: this.book.tags
+                books: {},
+                selected_book: {},
+                selected_edition: null
             }
+        },
+        mounted() {
+            // Creating books array with different editions
+            this.books = {}
+            this.all_editions.forEach((edition) => {
+                if (!this.books[edition.book.id]) this.books[edition.book.id] = edition.book
+                if (!this.books[edition.book.id].editions) this.books[edition.book.id].editions = []
+                this.books[edition.book.id].editions.push({
+                    id: edition.id,
+                    edition_type: edition.edition_type.label,
+                    date: edition.edition_date
+                })
+            })
+            console.log({...this.books})
         },
         methods: {
             close(){
                 this.$emit('close')
             },
             async save(){
-                await this.addTags()
+                await this.addEdition()
                 this.$emit('close')
             },
-            addTag(newTag) {
-                const tag = {
-                    name: newTag,
-                    id: null
-                }
-                this.current_tags.push(tag)
-            },
-            async addTags(){
-                const {data} = await axios.post(this.book.id + '/add_tags', {
+            async addEdition(){
+                console.log(this.selected_edition)
+                const {data} = await axios.post('add_edition/' + this.selected_edition.id, {
                     tags: this.current_tags
                 })
-
-                console.log(data)
-
-                this.$emit('new-book', data)
+                this.$emit('new-edition', data)
             }
         }
     }
@@ -84,14 +84,19 @@
                 </svg>
                 </div>
                 <div class="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
-                <h3 class="text-base font-semibold leading-6 text-gray-900" id="modal-title">Add, edit or delete tags</h3>
+                <h3 class="text-base font-semibold leading-6 text-gray-900" id="modal-title">Add a book to your librarmy</h3>
                 <div class="mt-2">
-                    <p class="text-sm text-gray-500">Here, you can add or delete existing or new tags.</p>
+                    <p class="text-sm text-gray-500">Here, you can add a book with its edition to your librarmy.</p>
                 </div>
                 <div class="mt-2">
-                    <multiselect v-model="current_tags" :options="all_tags" track-by="id" label="name" :multiple="true" :taggable="true" @tag="addTag">
-                        <!-- <template slot="singleLabel" slot-scope="{ option }">{{ option.name }}</template> -->
-                    </multiselect>
+                    <select v-if="books && books.length !== 0" v-model="selected_book">
+                        <option disabled value="">Select a book</option>
+                        <option v-for="book in books" :value="book"><span v-if="book && book.title">{{ book.title }} - <span v-for="author in book.authors">{{ author.formatted_name }}</span></span></option>
+                    </select>
+                    <select v-if='selected_book && selected_book !== ""' v-model="selected_edition">
+                        <option disabled value="">Select an edition of this book</option>
+                        <option v-for="edition in selected_book.editions" :value="edition">{{ edition.edition_type }} ({{ edition.date }})</option>
+                    </select>
                 </div>
                 </div>
             </div>
@@ -105,5 +110,3 @@
     </div>
     </div>
 </template>
-
-<style src="vue-multiselect/dist/vue-multiselect.css"></style>

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
+use App\Models\Edition;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -38,6 +39,51 @@ class ProfileController extends Controller
         $request->user()->save();
 
         return Redirect::route('profile.edit');
+    }
+
+    public function editEdition(Request $request): Response
+    {
+        $editions = $request->user()
+        ->editions()
+        ->with(
+            'book', 
+            'book.authors', 
+            'book.genres', 
+            'book.tags', 
+            'edition_type')
+        ->get();
+
+        $all_editions = Edition::with(
+            'book', 
+            'book.authors', 
+            'book.genres', 
+            'book.tags', 
+            'edition_type')
+        ->get();
+
+        // dd($all_editions);
+
+        return Inertia::render('Profile/EditEdition', [
+            'editions' => $editions,
+            'all_editions' => $all_editions
+        ]);
+    }
+
+    public function addEdition(Request $request, $id)
+    {
+        $edition = Edition::with(
+            'book', 
+            'book.authors', 
+            'book.genres', 
+            'book.tags', 
+            'edition_type')
+        ->where('id', $id)
+        ->first();
+        // Attach pivot: how?
+        $edition->acquisition_date = now();
+        $request->user()->editions()->attach()
+        ->save($edition);
+        return $edition[0];
     }
 
     /**

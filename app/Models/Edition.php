@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 use App\Models\Book;
@@ -26,9 +27,9 @@ class Edition extends Model
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasOne
      */
-    public function edition_type(): HasOne
+    public function edition_type(): BelongsTo
     {
-        return $this->hasOne(EditionType::class);
+        return $this->belongsTo(EditionType::class);
     }
 
     /**
@@ -46,9 +47,9 @@ class Edition extends Model
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasOne
      */
-    public function book(): HasOne
+    public function book(): BelongsTo
     {
-        return $this->hasOne(Book::class);
+        return $this->belongsTo(Book::class);
     }
 
     /**
