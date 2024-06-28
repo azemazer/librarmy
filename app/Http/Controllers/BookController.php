@@ -32,7 +32,7 @@ class BookController extends Controller
             'author' => 'required|integer'
         ]);
 
-        $author = Author::find($request->author);
+        $author = Author::findOrFail($request->author);
 
         $book = Book::create([
             'title' => $request->title,
@@ -58,10 +58,21 @@ class BookController extends Controller
         ]);
     }
 
-    public function getAll(): Response
+    public function getAll(Request $request): Response
     {
-        $books = Book::with('authors')
+        $books = Book::with('authors', 'wishlisted_by')
         ->get();
+
+        if($request->user()){
+            $books->map(function ($book) use ($request) {
+                if (sizeof($book->wishlisted_by->filter(function ($value) use ($request) {
+                    return $value->id == $request->user()->id;
+                })) > 0){
+                    $book->is_wishlisted = true;
+                }
+                return $book;
+            });
+        }
         return Inertia::render('Books/GetAll', [
             'books' => $books
         ]);
@@ -86,4 +97,17 @@ class BookController extends Controller
 
         return $book->refresh();
     }
+
+    public function addToWishlist(Request $request, $id)
+    {
+        $request->user()->wishlisted_books()->attach($id);
+        return 1;
+    }
+
+    public function deleteFromWishlist(Request $request, $id)
+    {
+        $request->user()->wishlisted_books()->detach($id);
+        return 1;
+    }
+
 }

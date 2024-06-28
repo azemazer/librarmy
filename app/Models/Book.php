@@ -28,7 +28,7 @@ class Book extends Model
     /**
      * Get all of the authors for the Book
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
     public function authors(): BelongsToMany
     {
@@ -38,7 +38,7 @@ class Book extends Model
     /**
      * Get all of the tags for the Book
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
     public function tags(): BelongsToMany
     {
@@ -48,10 +48,20 @@ class Book extends Model
     /**
      * Get all of the genres for the Book
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
     public function genres(): BelongsToMany
     {
         return $this->belongsToMany(Genre::class);
+    }
+
+    /**
+     * Get all of the users who wishlisted for the Book
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
+    public function wishlisted_by(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class);
     }
 }

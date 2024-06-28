@@ -23,8 +23,12 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::get('/profile/librarmy', [ProfileController::class, 'editEdition'])->name('profile.edit_edition');
     Route::post('/profile/add_edition/{id}', [ProfileController::class, 'addEdition'])->name('profile.add_edition');
+    Route::delete('/profile/delete_edition/{id}', [ProfileController::class, 'deleteEdition'])->name('profile.delete_edition');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    Route::post('/book/{id}/wishlist', [BookController::class, 'addToWishlist'])->name('book.add_wishlist');
+    Route::delete('/book/{id}/wishlist', [BookController::class, 'deleteFromWishlist'])->name('book.delete_wishlist');
 });
 
 Route::get('/add_book', [BookController::class, 'create'])->name('book.create');

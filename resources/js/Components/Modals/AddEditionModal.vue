@@ -16,19 +16,19 @@
                 selected_edition: null
             }
         },
-        mounted() {
+        created() {
             // Creating books array with different editions
-            this.books = {}
+            let new_books = {}
             this.all_editions.forEach((edition) => {
-                if (!this.books[edition.book.id]) this.books[edition.book.id] = edition.book
-                if (!this.books[edition.book.id].editions) this.books[edition.book.id].editions = []
-                this.books[edition.book.id].editions.push({
+                if (!new_books[edition.book.id]) new_books[edition.book.id] = {...edition.book}
+                if (!new_books[edition.book.id].editions) new_books[edition.book.id].editions = []
+                new_books[edition.book.id].editions.push({
                     id: edition.id,
                     edition_type: edition.edition_type.label,
                     date: edition.edition_date
                 })
             })
-            console.log({...this.books})
+            this.books = new_books
         },
         methods: {
             close(){
@@ -39,10 +39,7 @@
                 this.$emit('close')
             },
             async addEdition(){
-                console.log(this.selected_edition)
-                const {data} = await axios.post('add_edition/' + this.selected_edition.id, {
-                    tags: this.current_tags
-                })
+                const {data} = await axios.post('add_edition/' + this.selected_edition.id)
                 this.$emit('new-edition', data)
             }
         }

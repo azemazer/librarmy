@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
 use App\Models\Edition;
+use App\Models\User;
+
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -78,12 +80,33 @@ class ProfileController extends Controller
             'book.tags', 
             'edition_type')
         ->where('id', $id)
-        ->first();
+        ->firstOrFail();
         // Attach pivot: how?
-        $edition->acquisition_date = now();
-        $request->user()->editions()->attach()
-        ->save($edition);
-        return $edition[0];
+
+        /** @var User $user */
+        $user = $request->user();
+        $user->editions()->attach($id, [
+            'acquisition_date' => now(),
+            'quantity' => 1
+        ]);
+
+        $edition = $user->editions()
+        ->with(
+            'book', 
+            'book.authors', 
+            'book.genres', 
+            'book.tags', 
+            'edition_type')
+        ->where('editions.id', $id)
+        ->firstOrFail();
+        return $edition;
+    }
+
+    public function deleteEdition(Request $request, $id)
+    {
+        $request->user()->editions()->detach($id);
+
+        return Edition::find($id);
     }
 
     /**

@@ -54,7 +54,7 @@ class User extends Authenticatable
     /**
      * Get all of the editions for the User
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
     public function editions(): BelongsToMany
     {
@@ -69,7 +69,7 @@ class User extends Authenticatable
     /**
      * Get all of the wanted books for the User
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
     public function wishlisted_books(): BelongsToMany
     {

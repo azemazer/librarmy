@@ -45,7 +45,7 @@ class Edition extends Model
     /**
      * Get the book associated with the Edition
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function book(): BelongsTo
     {
